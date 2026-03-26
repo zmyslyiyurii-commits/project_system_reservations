@@ -20,7 +20,8 @@ from core.views import room_list, book_room
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('accounts/', include('django.contrib.auth.urls')), # Це шукає шаблони в registration/
+    # Це підключає вхід, вихід та зміну пароля автоматично
+    path('accounts/', include('django.contrib.auth.urls')), 
     path('', room_list, name='room_list'),
     path('book/', book_room, name='book_room'),
 ]
