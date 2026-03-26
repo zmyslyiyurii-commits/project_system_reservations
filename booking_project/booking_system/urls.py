@@ -15,11 +15,12 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path
+from django.urls import path, include
 from core.views import room_list, book_room
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', room_list, name='room_list'),       # Головна сторінка зі списком
-    path('book/', book_room, name='book_room'), # Сторінка бронювання
+    path('accounts/', include('django.contrib.auth.urls')), # Це шукає шаблони в registration/
+    path('', room_list, name='room_list'),
+    path('book/', book_room, name='book_room'),
 ]
