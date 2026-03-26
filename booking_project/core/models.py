@@ -25,29 +25,31 @@ class Booking(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
     def clean(self):
-        # 1. Перевірка логіки дат (Пункт 1.1 ТЗ)
+        # 1. Перевірка, щоб дата початку була раніше дати завершення
         if self.start_date and self.end_date:
             if self.start_date >= self.end_date:
                 raise ValidationError("Дата початку має бути раніше дати завершення.")
             
+            # 2. Перевірка, щоб не бронювали на минуле
             if self.start_date < timezone.now().date():
-                raise ValidationError("Не можна забронювати на минуле.")
+                raise ValidationError("Не можна забронювати кімнату на минулу дату.")
 
-            # 2. Перевірка на перетин дат (Пункт 1.2 ТЗ)
+            # 3. ПЕРЕВІРКА НА ПЕРЕТИН ДАТ (Пункт 1.2 ТЗ)
+            # Шукаємо бронювання цієї ж кімнати, де дати перетинаються з нашими
             overlapping_bookings = Booking.objects.filter(
                 room=self.room,
                 start_date__lt=self.end_date,
                 end_date__gt=self.start_date
-            ).exclude(pk=self.pk)
+            ).exclude(pk=self.pk) # Не рахуємо поточне бронювання при редагуванні
 
             if overlapping_bookings.exists():
-                raise ValidationError("Ця кімната вже зайнята на обрані дати!")
+                raise ValidationError(f"Кімната '{self.room.name}' уже зайнята на цей період.")
 
     def save(self, *args, **kwargs):
-        self.full_clean() # Обов'язково викликаємо перевірку перед збереженням
+        self.full_clean() # Викликаємо clean() перед збереженням у базу
         super().save(*args, **kwargs)
 
     def __str__(self):
-        return f"Бронювання {self.room.name} (з {self.start_date} по {self.end_date})"
+        return f"Бронювання {self.room.name} ({self.start_date} - {self.end_date})"
     
 # python manage.py runserver
