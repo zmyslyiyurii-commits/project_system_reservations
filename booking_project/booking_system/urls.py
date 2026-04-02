@@ -16,12 +16,26 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
-from core.views import room_list, book_room
+from django.conf import settings
+from django.conf.urls.static import static
+from core import views
 
 urlpatterns = [
+    # Адмінка
     path('admin/', admin.site.urls),
-    # Це підключає вхід, вихід та зміну пароля автоматично
-    path('accounts/', include('django.contrib.auth.urls')), 
-    path('', room_list, name='room_list'),
-    path('book/', book_room, name='book_room'),
+    
+    # Стандартні шляхи авторизації (login, logout)
+    path('accounts/', include('django.contrib.auth.urls')),
+    
+    # Реєстрація
+    path('signup/', views.signup, name='signup'),
+    
+    # Головна сторінка та деталі кімнати
+    path('', views.room_list, name='room_list'),
+    path('room/<int:pk>/', views.room_detail, name='room_detail'),
+    path('my-bookings/', views.my_bookings, name='my_bookings'),
 ]
+
+# Це критично важливий блок для відображення завантажених фото
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

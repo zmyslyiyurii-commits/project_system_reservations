@@ -1,0 +1,30 @@
+{% extends 'core/base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2 class="mb-4">Мої бронювання</h2>
+    <div class="row">
+        {% for booking in bookings %}
+        <div class="col-md-6 mb-3">
+            <div class="card shadow-sm border-start border-success border-4">
+                <div class="card-body">
+                    <h5 class="card-title">{{ booking.room.name }}</h5>
+                    <p class="card-text mb-1">
+                        <strong>Дата:</strong> {{ booking.start_time|date:"d.m.Y" }}
+                    </p>
+                    <p class="card-text mb-1">
+                        <strong>Час:</strong> {{ booking.start_time|date:"H:i" }} — {{ booking.end_time|date:"H:i" }}
+                    </p>
+                    <span class="badge bg-success">Підтверджено</span>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="col-12 text-center">
+            <p class="text-muted">У вас поки немає бронювань.</p>
+            <a href="{% url 'room_list' %}" class="btn btn-outline-primary">Переглянути зали</a>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

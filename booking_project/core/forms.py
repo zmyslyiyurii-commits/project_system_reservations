@@ -1,17 +1,22 @@
 from django import forms
 from .models import Booking
+from django.core.exceptions import ValidationError
 
 class BookingForm(forms.ModelForm):
     class Meta:
         model = Booking
-        fields = ['room', 'start_date', 'end_date']
+        fields = ['start_time', 'end_time']
         widgets = {
-            'room': forms.Select(attrs={'class': 'form-select'}),
-            'start_date': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
-            'end_date': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
+            'start_time': forms.DateTimeInput(attrs={'type': 'datetime-local', 'class': 'form-control'}),
+            'end_time': forms.DateTimeInput(attrs={'type': 'datetime-local', 'class': 'form-control'}),
         }
-        labels = {
-            'room': 'Оберіть кімнату',
-            'start_date': 'Дата початку',
-            'end_date': 'Дата завершення',
-        }
+
+    def clean(self):
+        cleaned_data = super().clean()
+        start_time = cleaned_data.get('start_time')
+        end_time = cleaned_data.get('end_time')
+
+        if start_time and end_time:
+            if start_time >= end_time:
+                raise ValidationError("Час завершення має бути пізніше часу початку.")
+        return cleaned_data
