@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
+import math
 
 class Category(models.Model):
     name = models.CharField(max_length=100, verbose_name="Назва категорії")
@@ -35,6 +36,15 @@ class Booking(models.Model):
 
     def __str__(self):
         return f"{self.user.username} - {self.room.name} ({self.start_time.strftime('%d.%m %H:%M')})"
+
+    @property
+    def total_price(self):
+        if self.start_time and self.end_time:
+            duration = self.end_time - self.start_time
+            hours = duration.total_seconds() / 3600
+            if hours > 0:
+                return round(float(self.room.price_per_hour) * hours, 2)
+        return 0
 
     class Meta:
         verbose_name = "Бронювання"

@@ -18,13 +18,21 @@ from django.contrib import admin
 from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
+from django.contrib.auth import views as auth_views  # Додано для кастомізації входу
 from core import views
+from core.forms import LoginForm  # Імпортуємо твою форму з підказками
 
 urlpatterns = [
     # Адмінка
     path('admin/', admin.site.urls),
     
-    # Стандартні шляхи авторизації (login, logout)
+    # Кастомний вхід з нашою формою (Логін/Пароль українською)
+    path('accounts/login/', auth_views.LoginView.as_view(
+        template_name='registration/login.html', 
+        authentication_form=LoginForm
+    ), name='login'),
+
+    # Решта стандартних шляхів (logout тощо)
     path('accounts/', include('django.contrib.auth.urls')),
     
     # Реєстрація
@@ -36,6 +44,6 @@ urlpatterns = [
     path('my-bookings/', views.my_bookings, name='my_bookings'),
 ]
 
-# Це критично важливий блок для відображення завантажених фото
+# Блок для відображення фото залів
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

@@ -1,25 +1,39 @@
-{% extends 'core/base.html' %}
+{% load static %}
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="{% static 'css/auth.css' %}">
+    <title>Вхід / Реєстрація</title>
+</head>
+<body class="auth-body">
 
-{% block content %}
-<div class="row justify-content-center mt-5">
-    <div class="col-md-4">
-        <div class="card shadow">
-            <div class="card-body">
-                <h3 class="card-title text-center mb-4">Вхід</h3>
-                <form method="post">
-                    {% csrf_token %}
-                    <div class="mb-3">
-                        {{ form.as_p }}
+<div class="login-wrap">
+    <div class="h1">Вхід</div>
+    
+    <form method="post">
+        {% csrf_token %}
+        
+        {% for field in form %}
+            <div class="mb-3">
+                {{ field }}
+                {% if field.errors %}
+                    <div style="color: #ff4d4d; font-size: 0.7em; margin-top: 5px;">
+                        {{ field.errors }}
                     </div>
-                    <button type="submit" class="btn btn-primary w-100">Увійти</button>
-                </form>
-                <hr>
-                <div class="text-center">
-                    <p class="mb-0 text-muted">Ще не маєте акаунту?</p>
-                    <a href="{% url 'signup' %}" class="btn btn-link">Створити новий акаунт</a>
-                </div>
+                {% endif %}
             </div>
-        </div>
+        {% endfor %}
+
+        <button type="submit" class="btn-submit">Увійти</button>
+    </form>
+    
+    <div style="margin-top: 25px; text-align: center;">
+        <a href="{% url 'signup' %}" style="color: #00ddeb; text-decoration: none; font-size: 0.8em;">
+            Немає акаунту? Реєстрація
+        </a>
     </div>
 </div>
-{% endblock %}
+
+</body>
+</html>

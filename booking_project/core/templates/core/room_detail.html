@@ -1,50 +1,90 @@
 {% extends 'core/base.html' %}
 
 {% block content %}
-<div class="container mt-4">
-    <div class="row">
-        <div class="col-lg-8">
-            {% if room.image %}
-                <img src="{{ room.image.url }}" class="img-fluid rounded shadow-lg mb-4" alt="{{ room.name }}" style="width: 100%; max-height: 500px; object-fit: cover;">
-            {% endif %}
-        </div>
+<style>
+    .datetime-input {
+        width: 100%;
+        padding: 12px;
+        background: #333 !important;
+        border: 1px solid #444 !important;
+        border-radius: 8px !important;
+        color: white !important;
+        outline: none;
+        box-sizing: border-box;
+    }
+</style>
 
-        <div class="col-lg-4">
-            <div class="card border-0 bg-white p-4 shadow-sm">
-                <h1 class="h2 mb-2">{{ room.name }}</h1>
-                <span class="badge bg-info text-dark align-self-start mb-3">{{ room.category.name }}</span>
-                <p class="text-muted">{{ room.description }}</p>
-                <hr>
-                <p><strong>Вартість:</strong> {{ room.price_per_hour }} грн/год</p>
-
-                {% if user.is_authenticated %}
-                    <h5 class="mt-4">Оберіть час бронювання:</h5>
-                    
-                    {% if error_message %}
-                        <div class="alert alert-danger">{{ error_message }}</div>
-                    {% endif %}
-
-                    <form method="post">
-                        {% csrf_token %}
-                        <div class="mb-3">
-                            <label class="form-label text-muted small">Початок:</label>
-                            {{ form.start_time }}
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label text-muted small">Кінець:</label>
-                            {{ form.end_time }}
-                        </div>
-                        <button type="submit" class="btn btn-success btn-lg w-100 shadow-sm">
-                            ✅ Підтвердити бронювання
-                        </button>
-                    </form>
-                {% else %}
-                    <div class="alert alert-warning text-center">
-                        Будь ласка, <a href="{% url 'login' %}">увійдіть</a>, щоб забронювати.
-                    </div>
-                {% endif %}
+<div style="max-width: 900px; margin: 40px auto; padding: 20px;">
+    <div style="background: #2c2c2c; border-radius: 20px; overflow: hidden; border: 1px solid #3c3c3c; box-shadow: 0 15px 30px rgba(0,0,0,0.4);">
+        
+        {% if room.image %}
+            <img src="{{ room.image.url }}" style="width: 100%; height: 400px; object-fit: cover;">
+        {% else %}
+            <div style="width: 100%; height: 400px; background: #333; display: flex; align-items: center; justify-content: center;">
+                <span style="color: #666;">Фото відсутнє</span>
             </div>
+        {% endif %}
+
+        <div style="padding: 40px; color: white;">
+            <h1 style="color: #00ddeb; margin-top: 0;">{{ room.name }}</h1>
+            <p style="color: #ccc;">{{ room.category.name }}</p>
+            <p style="margin-bottom: 25px;">{{ room.description }}</p>
+            
+            <p>Вартість: <strong id="price-val">{{ room.price_per_hour|stringformat:".2f" }}</strong> грн/год</p>
+
+            <form method="post" style="background: #252525; padding: 30px; border-radius: 15px; border: 1px solid #333;">
+                {% csrf_token %}
+                <h3 style="color: #fff; margin-top: 0; margin-bottom: 20px;">Оберіть час бронювання:</h3>
+                
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px;">
+                    <div>
+                        <label style="display: block; color: #888; margin-bottom: 8px;">Початок:</label>
+                        {{ form.start_time }}
+                    </div>
+                    <div>
+                        <label style="display: block; color: #888; margin-bottom: 8px;">Кінець:</label>
+                        {{ form.end_time }}
+                    </div>
+                </div>
+
+                <div id="price-calc-box" style="display: none; padding: 20px; background: #1a1a1a; border-radius: 12px; border: 1px dashed #af40ff; text-align: center; margin-bottom: 20px;">
+                    <p style="margin: 0; color: #aaa;">Тривалість: <span id="hours-count" style="color: #fff; font-weight: bold;">0</span> год.</p>
+                    <p style="margin: 5px 0 0 0; font-size: 1.4em; color: #af40ff; font-weight: bold;">До сплати: <span id="total-val">0</span> грн</p>
+                </div>
+
+                <button type="submit" style="width: 100%; padding: 16px; background: linear-gradient(144deg, #af40ff, #5b42f3 50%, #00ddeb); border: none; border-radius: 50px; color: white; cursor: pointer; font-weight: bold; font-size: 1.1em;">
+                    Підтвердити бронювання
+                </button>
+            </form>
         </div>
     </div>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const startInput = document.getElementById('id_start_time');
+    const endInput = document.getElementById('id_end_time');
+    const priceBox = document.getElementById('price-calc-box');
+    const hoursSpan = document.getElementById('hours-count');
+    const totalSpan = document.getElementById('total-val');
+    const pricePerHour = parseFloat(document.getElementById('price-val').innerText.replace(',', '.'));
+
+    function calculate() {
+        if (startInput.value && endInput.value) {
+            const start = new Date(startInput.value);
+            const end = new Date(endInput.value);
+            if (end > start) {
+                const hours = (end - start) / (1000 * 60 * 60);
+                hoursSpan.innerText = hours.toFixed(1);
+                totalSpan.innerText = (hours * pricePerHour).toFixed(2);
+                priceBox.style.display = 'block';
+            } else {
+                priceBox.style.display = 'none';
+            }
+        }
+    }
+    startInput.addEventListener('input', calculate);
+    endInput.addEventListener('input', calculate);
+});
+</script>
 {% endblock %}

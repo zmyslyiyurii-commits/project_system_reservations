@@ -1,7 +1,41 @@
-<h2>Реєстрація</h2>
-<form method="post">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit">Створити акаунт</button>
-</form>
-<p>Вже є акаунт? <a href="{% url 'login' %}">Увійти</a></p>
+{% load static %}
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="{% static 'css/auth.css' %}">
+    <title>Реєстрація</title>
+</head>
+<body class="auth-body">
+
+<div class="login-wrap">
+    <div class="h1">Реєстрація</div>
+    
+    <form method="post">
+        {% csrf_token %}
+        
+        {% for field in form %}
+            <div class="form-group">
+                {{ field }}
+                {% if field.errors %}
+                    {% for error in field.errors %}
+                        <div style="color: #ff4d4d; font-size: 0.7em; margin-left: 15px; margin-top: 5px;">
+                            {{ error }}
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            </div>
+        {% endfor %}
+
+        <button type="submit" class="btn-submit">Створити акаунт</button>
+    </form>
+    
+    <div style="margin-top: 25px; text-align: center;">
+        <a href="{% url 'login' %}" style="color: #00ddeb; text-decoration: none; font-size: 0.8em;">
+            Вже є акаунт? Увійти
+        </a>
+    </div>
+</div>
+
+</body>
+</html>

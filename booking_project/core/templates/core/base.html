@@ -1,34 +1,56 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="uk">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Система Бронювання</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <title>BookingSystem</title>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
     <style>
-        body { background-color: #f8f9fa; }
-        .navbar { margin-bottom: 30px; }
+        /* Стиль для кнопки виходу, щоб вона виглядала як посилання або кнопка в меню */
+        .logout-btn {
+            background: rgba(255, 75, 43, 0.1);
+            border: 1px solid #ff4b2b;
+            color: #ff4b2b;
+            padding: 6px 15px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: 0.3s;
+            font-family: inherit;
+        }
+        .logout-btn:hover {
+            background: #ff4b2b;
+            color: white;
+            box-shadow: 0 0 10px rgba(255, 75, 43, 0.5);
+        }
+        nav {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            padding: 15px 5%;
+            background: #1a1a1a;
+        }
     </style>
 </head>
-<body>
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-        <div class="container">
-            <a class="navbar-brand" href="{% url 'room_list' %}">BookingSystem</a>
-                <div class="navbar-nav ms-auto">
-                    {% if user.is_authenticated %}
-                        <a class="nav-link text-light me-3" href="{% url 'my_bookings' %}">📂 Мої бронювання</a>
-                        
-                        <span class="nav-link text-light me-3">Привіт, {{ user.username }}!</span>
-                        
-                        <form action="{% url 'logout' %}" method="post" class="d-inline">
-                            {% csrf_token %}
-                            <button type="submit" class="btn btn-outline-light btn-sm">Вийти</button>
-                        </form>
-                    {% else %}
-                        <a class="btn btn-outline-light btn-sm" href="{% url 'login' %}">Увійти</a>
-                    {% endif %}
-                </div>
-        </div>
+<body style="background-color: #121212; color: white; margin: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;">
+
+    <nav>
+        <a href="{% url 'room_list' %}" style="color: #af40ff; text-decoration: none; font-weight: bold; font-size: 1.5em; margin-right: auto;">BookingSystem</a>
+        
+        <a href="{% url 'room_list' %}" style="color: white; text-decoration: none;">Головна</a>
+        
+        {% if user.is_authenticated %}
+            <a href="{% url 'my_bookings' %}" style="color: white; text-decoration: none;">📂 Мої бронювання</a>
+            <span style="color: #00ddeb;">Привіт, {{ user.username }}!</span>
+            
+            <form action="{% url 'logout' %}" method="post" style="display: inline;">
+                {% csrf_token %}
+                <button type="submit" class="logout-btn">Вийти</button>
+            </form>
+        {% else %}
+            <a href="{% url 'login' %}" style="color: white; text-decoration: none;">Увійти</a>
+            <a href="{% url 'signup' %}" style="color: #af40ff; text-decoration: none;">Реєстрація</a>
+        {% endif %}
     </nav>
 
     <div class="container">
@@ -36,6 +58,5 @@
         {% endblock %}
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
